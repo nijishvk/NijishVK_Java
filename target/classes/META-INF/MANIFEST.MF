@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: Admin
+Build-Jdk: 9.0.4
+Implementation-Title: coding-test
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: ubs
+Implementation-Vendor: Pivotal Software, Inc.
+Implementation-URL: http://projects.spring.io/spring-boot/coding-test/
+Created-By: Maven Integration for Eclipse
+

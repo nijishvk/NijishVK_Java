@@ -1,8 +1,12 @@
-package com.ubs.main;
+package com.ubs.service;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.ubs.processor.CSVProcessor;
 import com.ubs.processor.CsvFileWriter;
@@ -10,21 +14,13 @@ import com.ubs.processor.JsonProcessor;
 import com.ubs.vo.PositionsVO;
 import com.ubs.vo.TransactionVO;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+@Service
+public class EodService {
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.Banner;
-
-@SpringBootApplication
-public class PositionCalculationProcess implements CommandLineRunner {
-
-	// @Autowired
-	private CSVProcessor csvprocess = new CSVProcessor();
-
-	// @Autowired
-	private JsonProcessor jsonprocess = new JsonProcessor();
+	@Autowired
+	private CSVProcessor csvprocess;
+	@Autowired
+	private JsonProcessor jsonprocess;
 
 	@Value("${csvfile}")
 	private String csvfile;
@@ -35,18 +31,13 @@ public class PositionCalculationProcess implements CommandLineRunner {
 	@Value("${output}")
 	private String output;
 
-	public static void main(String args[]) {
-		SpringApplication app = new SpringApplication(PositionCalculationProcess.class);
-		app.setBannerMode(Banner.Mode.OFF);
-		app.run(args);
-	}
+	public void process() {
 
-	public void run(String... arg0) throws Exception {
 		List<PositionsVO> pos = csvprocess.processInputFile(csvfile);
 		List<PositionsVO> deltaList = new ArrayList<PositionsVO>();
 		List<TransactionVO> trans = jsonprocess.getTransaction(jsonfile);
 
-		// loop through positins
+		// loop through positions
 		for (PositionsVO positionsVO : pos) {
 			PositionsVO delta = new PositionsVO();
 			delta.setAccount(positionsVO.getAccount());
@@ -59,33 +50,25 @@ public class PositionCalculationProcess implements CommandLineRunner {
 						&& positionsVO.getAccountType().equals("E")) {
 
 					if (transactionVO.getTransactionType().equals("B")) {
-						// delta.setQuantity(positionsVO.getQuantity()+transactionVO.getTransactionQuantity());
 						// Quantity = Quantity + TransactionQuantity
 						EQuantity = EQuantity + transactionVO.getTransactionQuantity();
 					}
 					if (transactionVO.getTransactionType().equals("S")) {
-						// delta.setQuantity(positionsVO.getQuantity()-transactionVO.getTransactionQuantity());
 						// Quantity = Quantity - TransactionQuantity
 						EQuantity = EQuantity - transactionVO.getTransactionQuantity();
 					}
-
 				}
-
 				if (positionsVO.getInstrument().equals(transactionVO.getInstrument())
 						&& positionsVO.getAccountType().equals("I")) {
-
 					if (transactionVO.getTransactionType().equals("B")) {
-						// delta.setQuantity(positionsVO.getQuantity()-transactionVO.getTransactionQuantity());
 						// Quantity = Quantity - TransactionQuantity
 						IQuantity = IQuantity - transactionVO.getTransactionQuantity();
 					}
 					if (transactionVO.getTransactionType().equals("S")) {
-						delta.setQuantity(positionsVO.getQuantity() + transactionVO.getTransactionQuantity());
 						// Quantity = Quantity + TransactionQuantity
 						IQuantity = IQuantity + transactionVO.getTransactionQuantity();
 					}
 				}
-
 			}
 			if (positionsVO.getAccountType().equals("I")) {
 				delta.setQuantity(IQuantity);
