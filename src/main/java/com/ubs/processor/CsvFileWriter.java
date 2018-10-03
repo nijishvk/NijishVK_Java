@@ -18,7 +18,7 @@ public class CsvFileWriter {
 	//CSV file header
 	private static final String FILE_HEADER = "Instrument,Account,AccountType,Quantity,Delta";
 
-	public static void writeCsvFile(String fileName,List<PositionsVO> list) {
+	public static void writeCsvFile(String fileName,List<PositionsVO> list) throws Exception {
 		
 			
 		FileWriter fileWriter = null;
@@ -32,7 +32,7 @@ public class CsvFileWriter {
 			//Add a new line separator after the header
 			fileWriter.append(NEW_LINE_SEPARATOR);
 			
-			//Write a new student object list to the CSV file
+			//Write a new object list to the CSV file
 			for (PositionsVO vo : list) {
 				fileWriter.append(vo.getInstrument());
 				fileWriter.append(COMMA_DELIMITER);
@@ -53,6 +53,7 @@ public class CsvFileWriter {
 		} catch (Exception e) {
 			System.out.println("Error in CsvFileWriter !!!");
 			e.printStackTrace();
+			throw new Exception("Error in CsvFileWriter",e);
 		} finally {
 			
 			try {

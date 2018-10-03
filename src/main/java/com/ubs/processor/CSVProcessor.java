@@ -18,7 +18,7 @@ import com.ubs.vo.PositionsVO;
 @Service
 public class CSVProcessor {
 
-	public List<PositionsVO> processInputFile(String inputFilePath) {
+	public List<PositionsVO> processInputFile(String inputFilePath) throws Exception {
 		List<PositionsVO> inputList = new ArrayList<PositionsVO>();
 		try {
 			File inputF = new File(inputFilePath);
@@ -28,18 +28,15 @@ public class CSVProcessor {
 			inputList = br.lines().skip(1).map(mapToItem).collect(Collectors.toList());
 			br.close();
 		} catch (IOException e) {
-
+			throw new Exception("error while reading csv file",e);
 		}
 		return inputList;
 	}
 
 	private Function<String, PositionsVO> mapToItem = (line) -> {
 		String[] p = line.split(",");// a CSV has comma separated lines
-		PositionsVO item = new PositionsVO();
-		item.setInstrument(p[0]);// <-- this is the first column in the csv file
-		item.setAccount(Long.parseLong(p[1]));
-		item.setAccountType(p[2]);
-		item.setQuantity(Long.parseLong(p[3]));
+		//String instrument, Long account, String accountType, Long quantity, Long delta
+		PositionsVO item = new PositionsVO(p[0], Long.parseLong(p[1]), p[2], Long.parseLong(p[3]), null);
 		return item;
 	};
 

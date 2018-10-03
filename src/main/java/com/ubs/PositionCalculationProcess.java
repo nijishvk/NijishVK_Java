@@ -20,8 +20,13 @@ public class PositionCalculationProcess implements CommandLineRunner {
 		app.run(args);
 	}
 
-	public void run(String... arg0) throws Exception {
-		eodService.process();
+	public void run(String... arg0) {
+		try {
+			eodService.process();
+		} catch (Exception e) {
+			System.out.print("Error occured on EOD process : "+e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 }
